@@ -10,7 +10,67 @@
 </head>
 
 <body>
-    <h1>Hello, Seg2D</h1>
+    <div class="main-panel">
+        <div class="top-panel">
+            <div class="left-panel">
+                <div class="content-panel">
+                    <div class="canvas-panel">
+                        <canvas width="2048" height="2048"></canvas>
+                    </div>
+                </div>
+                <div class="content-panel">
+                    <div class="canvas-panel">
+                        <canvas width="2048" height="2048"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="right-panel">
+                <div class="content-panel">
+                    <div class="canvas-panel">
+                        <canvas width="2048" height="2048"></canvas>
+                    </div>
+                </div>
+                <div class="content-panel">
+                    <div class="info-panel">
+                        <div class="left-panel">
+                            <div class="content-panel">
+                                <div class="plot-panel">
+                                    Histogram plot of phase fraction
+                                </div>
+                            </div>
+                            <div class="content-panel">
+                                <div class="plot-panel">
+                                    Scatter plot of porosity
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right-panel">
+                            <div class="content-panel">
+                                <div class="plot-panel">
+                                    Plot for pore info
+                                </div>
+                            </div>
+                            <div class="content-panel">
+                                <div class="plot-panel">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-panel">
+            <div style="padding: 20px;">
+                <button>Load images</button>
+                <button>&#60;</button>
+                <button>-</button>
+                <button>+</button>
+                <button>&#62;</button>
+                <button>Save images</button>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.index.entry %>"></script>
     <!-- PLEASE, REMOVE THIS COMMENT BEFORE YOU UPLOAD TO THE BACKEND
     <script type="text/javascript" src="{{ url_for('static', filename = 'js/index.js') }}"></script>
