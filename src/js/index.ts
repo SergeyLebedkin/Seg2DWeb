@@ -14,6 +14,8 @@ let radioDrawBSE: HTMLInputElement = null;
 let radioDragBSE: HTMLInputElement = null;
 let divCanvasPanelBSE: HTMLDivElement = null;
 let buttonLoadImages: HTMLButtonElement = null;
+let buttonPrevImage: HTMLButtonElement = null;
+let buttonNextImage: HTMLButtonElement = null;
 let buttonSaveImages: HTMLButtonElement = null;
 let inputLoadImagesSE: HTMLInputElement = null;
 let inputLoadImagesBSE: HTMLInputElement = null;
@@ -23,6 +25,7 @@ let gImageInfoListSE: Array<ImageInfo> = [];
 let gImageInfoListBSE: Array<ImageInfo> = [];
 let gImageInfoAreasEditorSE: ImageInfoAreasEditor = null;
 let gImageInfoAreasEditorBSE: ImageInfoAreasEditor = null;
+let gCurrentImageInfoIndex: number = -1;
 
 // loadImagesSE
 function loadImagesSE() {
@@ -121,6 +124,16 @@ function panelOnScroll(event: Event) {
     //element.scroll.scrollTop;
 }
 
+// buttonPrevImageOnClick
+function buttonPrevImageOnClick(event: MouseEvent) {
+    console.log("prev");
+}
+
+// buttonNextImageOnClick
+function buttonNextImageOnClick(event: MouseEvent) {
+    console.log("next");
+}
+
 // window - onload
 window.onload = (event) => {
     // get elements - SE
@@ -138,6 +151,8 @@ window.onload = (event) => {
     // get elements - controls
     buttonLoadImages = document.getElementById("buttonLoadImages") as HTMLButtonElement;
     buttonSaveImages = document.getElementById("buttonSaveImages") as HTMLButtonElement;
+    buttonPrevImage = document.getElementById("buttonPrevImage") as HTMLButtonElement;
+    buttonNextImage = document.getElementById("buttonNextImage") as HTMLButtonElement;
     inputLoadImagesSE = document.getElementById("inputLoadImagesSE") as HTMLInputElement;
     inputLoadImagesBSE = document.getElementById("inputLoadImagesBSE") as HTMLInputElement;
 
@@ -159,5 +174,7 @@ window.onload = (event) => {
     radioDrawBSE.onclick = event => radioDrawOnClick(event);
     divCanvasPanelBSE.onscroll = event => panelOnScroll(event);
     buttonLoadImages.onclick = event => buttonLoadImagesOnClick(event);
+    buttonPrevImage.onclick = event => buttonPrevImageOnClick(event);
+    buttonNextImage.onclick = event => buttonNextImageOnClick(event);
     buttonSaveImages.onclick = event => buttonSaveImagesOnClick(event);
 }

@@ -77,16 +77,16 @@
         <div class="bottom-panel">
             <div style="padding: 20px;">
                 <button id="buttonLoadImages">Load images</button>
-                <button>&#60;</button>
+                <button id="buttonPrevImage">&#60;</button>
                 <button>-</button>
                 <button>+</button>
-                <button>&#62;</button>
+                <button id="buttonNextImage">&#62;</button>
                 <button id="buttonSaveImages">Save images</button>
             </div>
         </div>
     </div>
-    <input type="file" id="inputLoadImagesSE" name="files[]" style="display:none">
-    <input type="file" id="inputLoadImagesBSE" name="files[]" style="display:none">
+    <input type="file" id="inputLoadImagesSE" multiple name="files[]" style="display:none">
+    <input type="file" id="inputLoadImagesBSE" multiple name="files[]" style="display:none">
     <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.index.entry %>"></script>
     <!-- PLEASE, REMOVE THIS COMMENT BEFORE YOU UPLOAD TO THE BACKEND
     <script type="text/javascript" src="{{ url_for('static', filename = 'js/index.js') }}"></script>
