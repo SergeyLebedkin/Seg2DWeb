@@ -36,15 +36,24 @@ html, body {
 }
 
 .content-panel {
-    display: block;
+    display: flex;
+    flex-direction: column;
     height: 50%;
-    padding: 10px;
+    margin: 5px;
+}
+
+.controls-panel {
+    display: block;
+    text-align: center;
+    background: black;
 }
 
 .canvas-panel {
     display: block;
     height: 100%;
     overflow: auto;
+    text-align: center;
+    background: black;
 }
 
 .plot-panel {
@@ -58,6 +67,11 @@ html, body {
     display: flex;
     flex-direction: row;
     height: 100%;
+}
+
+.label-radio {
+    width: 90px;
+    color: white;
 }
 
 canvas {
