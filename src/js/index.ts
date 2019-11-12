@@ -2,6 +2,7 @@ import { ImageInfo } from "./Seg2DWeb/Types/ImageInfo";
 import { MouseUsageMode } from "./Seg2DWeb/Types/MouseUsageMode";
 import { ImageInfoAreasEditor } from "./Seg2DWeb/Components/ImageInfoAreasEditor";
 import { SelectionInfo } from "./Seg2DWeb/Types/SelectionInfo";
+import { ImageInfoViewer } from "./Seg2DWeb/Components/ImageInfoViewer";
 
 // elements - SE
 let buttonScaleUpSE: HTMLButtonElement = null;
@@ -28,6 +29,7 @@ let buttonNextImage: HTMLButtonElement = null;
 let buttonSaveImages: HTMLButtonElement = null;
 let inputLoadImagesSE: HTMLInputElement = null;
 let inputLoadImagesBSE: HTMLInputElement = null;
+let divInfoViewer: HTMLDivElement = null;
 
 // globals
 let gImageInfoListSE: Array<ImageInfo> = [];
@@ -35,6 +37,7 @@ let gImageInfoListBSE: Array<ImageInfo> = [];
 let gImageInfoAreasEditorSE: ImageInfoAreasEditor = null;
 let gImageInfoAreasEditorBSE: ImageInfoAreasEditor = null;
 let gImageInfoAreasEditorSEG: ImageInfoAreasEditor = null;
+let gImageInfoViewer: ImageInfoViewer = null;
 let gCurrentImageInfoIndex: number = -1;
 
 // loadImagesSE
@@ -48,8 +51,10 @@ function loadImagesSE() {
                 gImageInfoListSE.push(imageInfo);
                 // show on view
                 if (!gImageInfoAreasEditorSE.imageInfo) {
+                    gCurrentImageInfoIndex = 0;
                     gImageInfoAreasEditorSE.setImageInfo(imageInfo);
                     gImageInfoAreasEditorSEG.setImageInfo(imageInfo);
+                    gImageInfoViewer.setImageInfo(imageInfo);
                 }
             }
             imageInfo.loadImageFile(file);
@@ -66,8 +71,11 @@ function loadImagesBSE() {
             let imageInfo = new ImageInfo();
             imageInfo.onloadImageFile = imageInfo => {
                 // add image info
+                //let seIndex = gImageInfoListSE.findIndex((imageInfo, index) => imageInfo.name.replace("_B", "_S") === imageInfo.name);
+                // add image info
                 gImageInfoListBSE.push(imageInfo);
                 // show on view
+                //gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);                
                 if (!gImageInfoAreasEditorBSE.imageInfo) {
                     gImageInfoAreasEditorBSE.setImageInfo(imageInfo);
                 }
@@ -86,6 +94,8 @@ function buttonLoadImagesOnClick(event: MouseEvent) {
 
 // buttonSaveImagesOnClick
 function buttonSaveImagesOnClick(event: MouseEvent) {
+    gImageInfoListSE.forEach((imageInfo, index) => console.log(imageInfo, index));
+    gImageInfoListBSE.forEach((imageInfo, index) => console.log(imageInfo, index));
 }
 
 // buttonScaleUpOnClick
@@ -144,12 +154,22 @@ function panelOnScroll(event: Event) {
 
 // buttonPrevImageOnClick
 function buttonPrevImageOnClick(event: MouseEvent) {
-    console.log("prev");
+    gCurrentImageInfoIndex--;
+    gCurrentImageInfoIndex = Math.max(gCurrentImageInfoIndex, 0);
+    gImageInfoAreasEditorSE.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
+    gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
+    gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
+    gImageInfoViewer.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
 }
 
 // buttonNextImageOnClick
 function buttonNextImageOnClick(event: MouseEvent) {
-    console.log("next");
+    gCurrentImageInfoIndex++;
+    gCurrentImageInfoIndex = Math.min(gCurrentImageInfoIndex, gImageInfoListSE.length-1);
+    gImageInfoAreasEditorSE.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
+    gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
+    gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
+    gImageInfoViewer.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
 }
 
 // onAddSelectionInfoSE
@@ -201,6 +221,7 @@ window.onload = (event) => {
     buttonNextImage = document.getElementById("buttonNextImage") as HTMLButtonElement;
     inputLoadImagesSE = document.getElementById("inputLoadImagesSE") as HTMLInputElement;
     inputLoadImagesBSE = document.getElementById("inputLoadImagesBSE") as HTMLInputElement;
+    divInfoViewer = document.getElementById("divInfoViewer") as HTMLDivElement;
 
     // create and setup image info area aditor
     gImageInfoAreasEditorSE = new ImageInfoAreasEditor(divCanvasPanelSE);
@@ -212,6 +233,9 @@ window.onload = (event) => {
     gImageInfoAreasEditorSEG = new ImageInfoAreasEditor(divCanvasPanelSEG);
     gImageInfoAreasEditorSEG.onAddSelectionInfo = onAddSelectionInfoSE;
     document.addEventListener("keydown", (event) => gImageInfoAreasEditorSEG.onKeyDown(event));
+
+    // create image info viewver 
+    gImageInfoViewer = new ImageInfoViewer(divInfoViewer);
 
     // add events - SE
     buttonScaleUpSE.onclick = event => buttonScaleUpOnClick(event);

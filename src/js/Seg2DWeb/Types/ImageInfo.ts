@@ -3,11 +3,15 @@ import { SelectionInfo } from "./SelectionInfo"
 import { SelectionInfoType } from "./SelectionInfoType"
 import { SelectionInfoMode } from "./SelectionInfoMode"
 
+export enum ImageType { SE, BSE };
+
 // ImageInfo
 export class ImageInfo {
     // file reference
     public fileRef: File = null;
     public dataFileRef: File = null;
+    // name (actully is a file name without ext)
+    public name: string;
     // canvases
     public canvasImage: HTMLCanvasElement = null;
     public canvasMask: HTMLCanvasElement = null;
@@ -15,6 +19,8 @@ export class ImageInfo {
     public canvasBorders: HTMLCanvasElement = null;
     public canvasHighResArea: HTMLCanvasElement = null;
     public canvasHighResMask: HTMLCanvasElement = null;
+    // image type
+    public imageType: ImageType = ImageType.SE;
     // selection infos
     public selectionInfos: Array<SelectionInfo> = [];
     // high resolution image suggestions settings
@@ -281,37 +287,27 @@ export class ImageInfo {
     public loadImageFile(file: File): void {
         // store data file ref
         this.fileRef = file;
+        // extract name from file name
+        this.name = this.fileRef.name;
+        if (this.name.lastIndexOf(".") >= 0)
+            this.name = this.name.split('.').slice(0, -1).join('.');
+
+        // get image type
+        if (this.name.lastIndexOf("_S") >= 0)
+            this.imageType = ImageType.SE;
+        if (this.name.lastIndexOf("_B") >= 0)
+            this.imageType = ImageType.BSE;
 
         // load from file
         let fileReader = new FileReader();
         fileReader.onload = event => {
+            // read tiff data
             let tiff = new Tiff({ buffer: fileReader.result });
             this.copyFromCanvas(tiff.toCanvas());
-
             // call event
-            if (this.onloadImageFile)
-                this.onloadImageFile(this);
+            this.onloadImageFile && this.onloadImageFile(this);
         }
         fileReader.readAsArrayBuffer(file);
-    }
-
-    // toStringXmlNode
-    public toStringXmlNode(): string {
-        // exract file name
-        var filename = this.fileRef.name.substr(0, this.fileRef.name.lastIndexOf('.'));
-
-        // generate xml node
-        let node: string = "";
-        node += "  <ImageData>" + "\r\n"
-        node += '    <ImageName FileName="' + this.fileRef.name + '"></ImageName>' + "\r\n";
-        node += '    <ImageBasename FileBasename="' + filename + '"></ImageBasename>' + "\r\n";
-        node += '    <IntensityBoundary LowIntensity="' + this.intensityLow + '" MediumIntensity="' + this.intensityMedium + '" HighIntensity="' + this.intensityHigh + '"></IntensityBoundary>' + "\r\n";
-
-        node += "    <AreaSelections>" + "\r\n";
-        this.selectionInfos.forEach(info => node += info.toStringXmlNode() + "\r\n");
-        node += "    </AreaSelections>" + "\r\n";
-        node += "  </ImageData>";
-        return node;
     }
 }
 
