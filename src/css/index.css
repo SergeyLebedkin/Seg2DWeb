@@ -74,6 +74,24 @@ html, body {
     color: white;
 }
 
-canvas {
-    border: 1px solid orange;
+.bottom-panel-button {
+    font-size: 16px;
+    border: none;
+    outline: none;
+    color: white;
+    padding: 16px 16px;
+    background-color: #333333;
+    border-radius: 5px;
+}
+
+.bottom-panel-button:hover {
+    background-color: #ff0000;
+}
+
+.bottom-panel-button:active {
+    background-color: #ff2222;
+}
+
+.bottom-panel-button:disabled {
+    background-color: #aaaaaa;
 }

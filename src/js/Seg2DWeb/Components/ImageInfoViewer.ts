@@ -1,9 +1,12 @@
 import { ImageInfo } from "../Types/ImageInfo";
 
+// ImageInfoViewer
 export class ImageInfoViewer {
     // parent
     private parent: HTMLDivElement = null;
     public imageInfo: ImageInfo = null;
+
+    // constructor
     constructor(parent: HTMLDivElement) {
         this.parent = parent;
     }
