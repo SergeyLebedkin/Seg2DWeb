@@ -12,6 +12,11 @@ export class SelectionInfo {
         this.selectionInfoMode = SelectionInfoMode.INCLUDE
     }
 
+    // clone
+    public clone(): SelectionInfo {
+        return null;
+    }
+
     // getType (I don`t like this solution. This function must return something like "Unknown". But, let it be as is)
     public getType(): SelectionInfoType {
         return SelectionInfoType.RECT;

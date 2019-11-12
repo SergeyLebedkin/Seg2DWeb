@@ -32,6 +32,7 @@ export class ImageInfoAreasEditor {
     private imageCanvasCtx: CanvasRenderingContext2D = null;
     // events
     public onclickHighResolutionArea: (this: ImageInfoAreasEditor, imageInfo: ImageInfo, areaIndex: number) => any = null;
+    public onAddSelectionInfo: (this: ImageInfoAreasEditor, selectionInfo: SelectionInfo) => any = null;
     // constructor
     constructor(parent: HTMLDivElement) {
         // setup parent
@@ -84,6 +85,8 @@ export class ImageInfoAreasEditor {
             this.imageInfo.updateBordersCanvas();
             this.imageInfo.updateHilightCanvas();
             this.imageInfo.updateIntensity();
+            // call event
+            this.onAddSelectionInfo && this.onAddSelectionInfo(this.selectionInfoRect);
             // draw image info
             this.drawImageInfo();
             // selection finished
@@ -129,6 +132,8 @@ export class ImageInfoAreasEditor {
                         this.imageInfo.updateBordersCanvas();
                         this.imageInfo.updateHilightCanvas();
                         this.imageInfo.updateIntensity();
+                        // call event
+                        this.onAddSelectionInfo && this.onAddSelectionInfo(this.selectionInfoArea);
                         // clear all selection states
                         this.cancelSelecion();
                     } else {
@@ -315,8 +320,8 @@ export class ImageInfoAreasEditor {
                 // draw borders canvas
                 this.imageCanvasCtx.globalAlpha = 0.5;
                 this.imageCanvasCtx.drawImage(this.imageInfo.canvasBorders, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
-                this.imageCanvasCtx.globalAlpha = 1.0;
-                this.imageCanvasCtx.drawImage(this.imageInfo.canvasHighResArea, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
+                //this.imageCanvasCtx.globalAlpha = 1.0;
+                //this.imageCanvasCtx.drawImage(this.imageInfo.canvasHighResArea, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
                 this.imageCanvasCtx.globalAlpha = 1.0;
             }
         } else {

@@ -40,8 +40,15 @@
             </div>
             <div class="right-panel">
                 <div class="content-panel">
-                    <div class="canvas-panel">
-                        <canvas width="2048" height="2048"></canvas>
+                    <div class="controls-panel">
+                        <button id="buttonScaleUpSEG">+</button>
+                        <button id="buttonScaleDownSEG">-</button>
+                        <input type="radio" id="radioDragSEG" name="MouseModeSEG" checked>
+                        <label class="label-radio" for="radioDragSEG">Drag</label>
+                        <input type="radio" id="radioDrawSEG" name="MouseModeSEG">
+                        <label class="label-radio" for="radioDrawSEG">Draw</label>
+                    </div>
+                    <div class="canvas-panel" id="divCanvasPanelSEG">
                     </div>
                 </div>
                 <div class="content-panel">
