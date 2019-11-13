@@ -46,10 +46,8 @@ function loadImagesSE() {
     inputLoadImagesSE.onchange = event => {
         for (let file of event.currentTarget["files"]) {
             let imageInfo = new ImageInfo();
+            gImageInfoListSE.push(imageInfo);
             imageInfo.onloadImageFile = imageInfo => {
-                // add image info
-                gImageInfoListSE.push(imageInfo);
-                // show on view
                 if (!gImageInfoAreasEditorSE.imageInfo) {
                     gCurrentImageInfoIndex = 0;
                     gImageInfoAreasEditorSE.setImageInfo(imageInfo);
@@ -69,13 +67,9 @@ function loadImagesBSE() {
     inputLoadImagesBSE.onchange = event => {
         for (let file of event.currentTarget["files"]) {
             let imageInfo = new ImageInfo();
+            gImageInfoListBSE.push(imageInfo);
             imageInfo.onloadImageFile = imageInfo => {
-                // add image info
-                //let seIndex = gImageInfoListSE.findIndex((imageInfo, index) => imageInfo.name.replace("_B", "_S") === imageInfo.name);
-                // add image info
-                gImageInfoListBSE.push(imageInfo);
                 // show on view
-                //gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);                
                 if (!gImageInfoAreasEditorBSE.imageInfo) {
                     gImageInfoAreasEditorBSE.setImageInfo(imageInfo);
                 }
