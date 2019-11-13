@@ -25,7 +25,9 @@ export class ImageInfoViewer {
         // fill parent
         if (this.imageInfo) {
             this.parent.innerHTML = `
-                <a>${this.imageInfo.name}</a>
+                <a>Name:${this.imageInfo.name}</a><br>
+                <a>Width:${this.imageInfo.canvasImage.width}</a><br>
+                <a>Height:${this.imageInfo.canvasImage.height}</a><br>
             `;
         }
     }
