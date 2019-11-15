@@ -300,7 +300,7 @@ export class ImageInfo {
 
         // load from file
         let fileReader = new FileReader();
-        fileReader.onload = event => {
+        fileReader.onloadend = event => {
             // read tiff data
             let tiff = new Tiff({ buffer: fileReader.result });
             this.copyFromCanvas(tiff.toCanvas());

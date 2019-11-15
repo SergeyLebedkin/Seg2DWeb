@@ -44,18 +44,19 @@ let gCurrentImageInfoIndex: number = -1;
 function loadImagesSE() {
     inputLoadImagesSE.accept = ".tiff,.tif";
     inputLoadImagesSE.onchange = event => {
-        for (let file of event.currentTarget["files"]) {
+        //for (let file of event.currentTarget["files"]) {
+        for (let i = 0; i < event.currentTarget["files"].length; i++) {
             let imageInfo = new ImageInfo();
             gImageInfoListSE.push(imageInfo);
             imageInfo.onloadImageFile = imageInfo => {
                 if (!gImageInfoAreasEditorSE.imageInfo) {
-                    gCurrentImageInfoIndex = 0;
+                    gCurrentImageInfoIndex = i;
                     gImageInfoAreasEditorSE.setImageInfo(imageInfo);
                     gImageInfoAreasEditorSEG.setImageInfo(imageInfo);
                     gImageInfoViewer.setImageInfo(imageInfo);
                 }
             }
-            imageInfo.loadImageFile(file);
+            imageInfo.loadImageFile(event.currentTarget["files"][i]);
         }
     }
     inputLoadImagesSE.click();
@@ -70,8 +71,8 @@ function loadImagesBSE() {
             gImageInfoListBSE.push(imageInfo);
             imageInfo.onloadImageFile = imageInfo => {
                 // show on view
-                if (!gImageInfoAreasEditorBSE.imageInfo) {
-                    gImageInfoAreasEditorBSE.setImageInfo(imageInfo);
+                if (gCurrentImageInfoIndex >= 0) {
+                    gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
                 }
             }
             imageInfo.loadImageFile(file);
@@ -151,7 +152,7 @@ function buttonPrevImageOnClick(event: MouseEvent) {
     gCurrentImageInfoIndex--;
     gCurrentImageInfoIndex = Math.max(gCurrentImageInfoIndex, 0);
     gImageInfoAreasEditorSE.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
-    gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
+    gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
     gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
     gImageInfoViewer.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
 }
@@ -161,7 +162,7 @@ function buttonNextImageOnClick(event: MouseEvent) {
     gCurrentImageInfoIndex++;
     gCurrentImageInfoIndex = Math.min(gCurrentImageInfoIndex, gImageInfoListSE.length-1);
     gImageInfoAreasEditorSE.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
-    gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
+    gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
     gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
     gImageInfoViewer.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
 }
