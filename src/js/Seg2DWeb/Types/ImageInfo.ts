@@ -11,7 +11,9 @@ export class ImageInfo {
     public fileRef: File = null;
     public dataFileRef: File = null;
     // name (actully is a file name without ext)
-    public name: string;
+    public name: string = "";
+    // flags
+    public loaded: boolean = false;
     // canvases
     public canvasImage: HTMLCanvasElement = null;
     public canvasMask: HTMLCanvasElement = null;
@@ -42,6 +44,8 @@ export class ImageInfo {
         // file reference
         this.fileRef = null;
         this.dataFileRef = null;
+        // flags
+        this.loaded = false;
         // canvases
         this.canvasImage = document.createElement("canvas");
         this.canvasMask = document.createElement("canvas");
@@ -286,6 +290,7 @@ export class ImageInfo {
     // loadImageDataFile
     public loadImageFile(file: File): void {
         // store data file ref
+        this.loaded = false;
         this.fileRef = file;
         // extract name from file name
         this.name = this.fileRef.name;
@@ -304,6 +309,7 @@ export class ImageInfo {
             // read tiff data
             let tiff = new Tiff({ buffer: fileReader.result });
             this.copyFromCanvas(tiff.toCanvas());
+            this.loaded = true;
             // call event
             this.onloadImageFile && this.onloadImageFile(this);
         }

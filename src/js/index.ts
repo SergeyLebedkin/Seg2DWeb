@@ -3,6 +3,7 @@ import { MouseUsageMode } from "./Seg2DWeb/Types/MouseUsageMode";
 import { ImageInfoAreasEditor } from "./Seg2DWeb/Components/ImageInfoAreasEditor";
 import { SelectionInfo } from "./Seg2DWeb/Types/SelectionInfo";
 import { ImageInfoViewer } from "./Seg2DWeb/Components/ImageInfoViewer";
+import { ImageInfoSetList } from "./Seg2DWeb/Types/ImageInfoSetList";
 
 // elements - SE
 let buttonScaleUpSE: HTMLButtonElement = null;
@@ -32,8 +33,7 @@ let inputLoadImagesBSE: HTMLInputElement = null;
 let divInfoViewer: HTMLDivElement = null;
 
 // globals
-let gImageInfoListSE: Array<ImageInfo> = [];
-let gImageInfoListBSE: Array<ImageInfo> = [];
+let gImageInfoSetList: ImageInfoSetList = null;
 let gImageInfoAreasEditorSE: ImageInfoAreasEditor = null;
 let gImageInfoAreasEditorBSE: ImageInfoAreasEditor = null;
 let gImageInfoAreasEditorSEG: ImageInfoAreasEditor = null;
@@ -44,20 +44,8 @@ let gCurrentImageInfoIndex: number = -1;
 function loadImagesSE() {
     inputLoadImagesSE.accept = ".tiff,.tif";
     inputLoadImagesSE.onchange = event => {
-        //for (let file of event.currentTarget["files"]) {
-        for (let i = 0; i < event.currentTarget["files"].length; i++) {
-            let imageInfo = new ImageInfo();
-            gImageInfoListSE.push(imageInfo);
-            imageInfo.onloadImageFile = imageInfo => {
-                if (!gImageInfoAreasEditorSE.imageInfo) {
-                    gCurrentImageInfoIndex = i;
-                    gImageInfoAreasEditorSE.setImageInfo(imageInfo);
-                    gImageInfoAreasEditorSEG.setImageInfo(imageInfo);
-                    gImageInfoViewer.setImageInfo(imageInfo);
-                }
-            }
-            imageInfo.loadImageFile(event.currentTarget["files"][i]);
-        }
+        gImageInfoSetList.setImageFilesSE(event.currentTarget["files"]);
+        loadImagesBSE();
     }
     inputLoadImagesSE.click();
 }
@@ -66,17 +54,7 @@ function loadImagesSE() {
 function loadImagesBSE() {
     inputLoadImagesBSE.accept = ".tiff,.tif";
     inputLoadImagesBSE.onchange = event => {
-        for (let file of event.currentTarget["files"]) {
-            let imageInfo = new ImageInfo();
-            gImageInfoListBSE.push(imageInfo);
-            imageInfo.onloadImageFile = imageInfo => {
-                // show on view
-                if (gCurrentImageInfoIndex >= 0) {
-                    gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
-                }
-            }
-            imageInfo.loadImageFile(file);
-        }
+        gImageInfoSetList.setImageFilesBSE(event.currentTarget["files"]);
     }
     inputLoadImagesBSE.click();
 }
@@ -84,13 +62,13 @@ function loadImagesBSE() {
 // buttonLoadImagesOnClick
 function buttonLoadImagesOnClick(event: MouseEvent) {
     loadImagesSE();
-    loadImagesBSE();
+    //loadImagesBSE();
 }
 
 // buttonSaveImagesOnClick
 function buttonSaveImagesOnClick(event: MouseEvent) {
-    gImageInfoListSE.forEach((imageInfo, index) => console.log(imageInfo, index));
-    gImageInfoListBSE.forEach((imageInfo, index) => console.log(imageInfo, index));
+    //gImageInfoListSE.forEach((imageInfo, index) => console.log(imageInfo, index));
+    //gImageInfoListBSE.forEach((imageInfo, index) => console.log(imageInfo, index));
 }
 
 // buttonScaleUpOnClick
@@ -150,21 +128,25 @@ function panelOnScroll(event: Event) {
 // buttonPrevImageOnClick
 function buttonPrevImageOnClick(event: MouseEvent) {
     gCurrentImageInfoIndex--;
+    /*
     gCurrentImageInfoIndex = Math.max(gCurrentImageInfoIndex, 0);
     gImageInfoAreasEditorSE.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
     gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
     gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
     gImageInfoViewer.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
+    */
 }
 
 // buttonNextImageOnClick
 function buttonNextImageOnClick(event: MouseEvent) {
     gCurrentImageInfoIndex++;
+    /*
     gCurrentImageInfoIndex = Math.min(gCurrentImageInfoIndex, gImageInfoListSE.length-1);
     gImageInfoAreasEditorSE.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
     gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
     gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
     gImageInfoViewer.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
+    */
 }
 
 // onAddSelectionInfoSE
@@ -217,6 +199,9 @@ window.onload = (event) => {
     inputLoadImagesSE = document.getElementById("inputLoadImagesSE") as HTMLInputElement;
     inputLoadImagesBSE = document.getElementById("inputLoadImagesBSE") as HTMLInputElement;
     divInfoViewer = document.getElementById("divInfoViewer") as HTMLDivElement;
+
+    // gImageInfoSetList
+    gImageInfoSetList = new ImageInfoSetList();
 
     // create and setup image info area aditor
     gImageInfoAreasEditorSE = new ImageInfoAreasEditor(divCanvasPanelSE);
