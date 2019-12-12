@@ -1,4 +1,6 @@
 import { ImageInfoSet } from "./ImageInfoSet";
+import * as base64js from "base64-js";
+import { ImageInfo, ImageType } from "./ImageInfo";
 
 // base URL
 export const URL = "http://localhost:8088";
@@ -7,10 +9,13 @@ export const URL = "http://localhost:8088";
 export class ImageInfoSetList {
     // fields
     public imageInfoSetList: Array<ImageInfoSet> = null;
+    // events
+    public onloadFromJson: (this: ImageInfoSetList) => any = null;
 
     // constructor
     constructor() {
         this.imageInfoSetList = [];
+        this.onloadFromJson = null;
     }
 
     // setImageFilesSE
@@ -42,8 +47,9 @@ export class ImageInfoSetList {
 
     // onloadImageFiles
     private onloadImageFiles(imageInfoSet: ImageInfoSet) {
-        if (this.isReadyToSend())
-            this.postImages();
+        if (this.isReadyToSend()) {
+            this.postImages().then(value => this.loadFromJson(value));
+        }
     }
 
     // isReadyToSend
@@ -85,8 +91,33 @@ export class ImageInfoSetList {
                 dataJSON.payload.images[imageInfoSet.name]["bse"] = imageInfoSet.imageInfoBSE.canvasImage.toDataURL().replace("data:image/png;base64,", "");
             });
             let data = JSON.stringify(dataJSON);
-            console.log(data);
             xhr.send(data);
         });
+    }
+
+    // loadFromJson
+    public loadFromJson(value: string) {
+        let valueJSON = JSON.parse(value);
+        let dims = JSON.parse(valueJSON.dimensions);
+        let segs = JSON.parse(valueJSON.segmentations);
+        console.log("dims", dims);
+        console.log("segs", segs);
+        for (let i = 0; i < dims.length; i++) {
+            this.imageInfoSetList[i].imageInfoSEG = new ImageInfo();
+            this.imageInfoSetList[i].imageInfoSEG.onloadFromBase64 = this.onLoadFromBase64.bind(this);
+            this.imageInfoSetList[i].imageInfoSEG.loadImageAsSegmented(dims[i][1], dims[i][0], segs[i]);
+            this.imageInfoSetList[i].imageInfoSEG.loaded = true;
+            this.imageInfoSetList[i].imageInfoSEG.imageType = ImageType.SEG;
+        }
+    }
+
+    // onLoadFromBase64
+    private onLoadFromBase64(imageInfo: ImageInfo) {
+        let loaded: boolean = true;
+        for (let imageInfoSet of this.imageInfoSetList)
+            if ((imageInfoSet.imageInfoSEG != null) && (!imageInfoSet.imageInfoSEG.loaded))
+                loaded = false;
+        if (loaded)
+            this.onloadFromJson && this.onloadFromJson();
     }
 }

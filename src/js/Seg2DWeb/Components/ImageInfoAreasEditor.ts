@@ -83,8 +83,6 @@ export class ImageInfoAreasEditor {
             this.imageInfo.addSelectionInfo(newSelectionInfo);
             // update image info
             this.imageInfo.updateBordersCanvas();
-            this.imageInfo.updateHilightCanvas();
-            this.imageInfo.updateIntensity();
             // call event
             this.onAddSelectionInfo && this.onAddSelectionInfo(this.selectionInfoRect);
             // draw image info
@@ -103,11 +101,6 @@ export class ImageInfoAreasEditor {
             let rect = this.imageCanvas.getBoundingClientRect();
             let mousePosX = event.clientX - rect.left;
             let mousePosY = event.clientY - rect.top;
-            // check for high resolution region
-            let highResAreaIndex = this.imageInfo.getMaskValueByCoord(mousePosX/this.imageScale, mousePosY/this.imageScale);
-            if (highResAreaIndex)
-                if (this.onclickHighResolutionArea)
-                    this.onclickHighResolutionArea(this.imageInfo, highResAreaIndex);
             // draw rect started
             if ((this.mouseUsageMode === MouseUsageMode.DRAW) && (this.selectionInfoType === SelectionInfoType.RECT)) {
                 // set selection info
@@ -130,8 +123,6 @@ export class ImageInfoAreasEditor {
                         this.imageInfo.addSelectionInfo(this.selectionInfoArea.clone());
                         // update image info
                         this.imageInfo.updateBordersCanvas();
-                        this.imageInfo.updateHilightCanvas();
-                        this.imageInfo.updateIntensity();
                         // call event
                         this.onAddSelectionInfo && this.onAddSelectionInfo(this.selectionInfoArea);
                         // clear all selection states

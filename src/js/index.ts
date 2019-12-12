@@ -4,6 +4,7 @@ import { ImageInfoAreasEditor } from "./Seg2DWeb/Components/ImageInfoAreasEditor
 import { SelectionInfo } from "./Seg2DWeb/Types/SelectionInfo";
 import { ImageInfoViewer } from "./Seg2DWeb/Components/ImageInfoViewer";
 import { ImageInfoSetList } from "./Seg2DWeb/Types/ImageInfoSetList";
+import { ImageInfoSet } from "./Seg2DWeb/Types/ImageInfoSet";
 
 // elements - SE
 let buttonScaleUpSE: HTMLButtonElement = null;
@@ -128,25 +129,15 @@ function panelOnScroll(event: Event) {
 // buttonPrevImageOnClick
 function buttonPrevImageOnClick(event: MouseEvent) {
     gCurrentImageInfoIndex--;
-    /*
     gCurrentImageInfoIndex = Math.max(gCurrentImageInfoIndex, 0);
-    gImageInfoAreasEditorSE.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
-    gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
-    gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
-    gImageInfoViewer.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
-    */
+    setCurrentImageInfoSet(gImageInfoSetList.imageInfoSetList[gCurrentImageInfoIndex]);
 }
 
 // buttonNextImageOnClick
 function buttonNextImageOnClick(event: MouseEvent) {
     gCurrentImageInfoIndex++;
-    /*
-    gCurrentImageInfoIndex = Math.min(gCurrentImageInfoIndex, gImageInfoListSE.length-1);
-    gImageInfoAreasEditorSE.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
-    gImageInfoAreasEditorSEG.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
-    gImageInfoAreasEditorBSE.setImageInfo(gImageInfoListBSE[gCurrentImageInfoIndex]);
-    gImageInfoViewer.setImageInfo(gImageInfoListSE[gCurrentImageInfoIndex]);
-    */
+    gCurrentImageInfoIndex = Math.min(gCurrentImageInfoIndex, gImageInfoSetList.imageInfoSetList.length - 1);
+    setCurrentImageInfoSet(gImageInfoSetList.imageInfoSetList[gCurrentImageInfoIndex]);
 }
 
 // onAddSelectionInfoSE
@@ -169,6 +160,22 @@ function onAddSelectionInfoBSE(selectionInfo: SelectionInfo) {
         gImageInfoAreasEditorBSE.drawImageInfo();
         gImageInfoAreasEditorSEG.drawImageInfo();
     }
+}
+
+// onLoadFromJson
+function onLoadFromJson() {
+    if (gCurrentImageInfoIndex < 0) {
+        gCurrentImageInfoIndex = 0;
+        setCurrentImageInfoSet(gImageInfoSetList.imageInfoSetList[gCurrentImageInfoIndex]);
+    }
+}
+
+// setCurrentImageInfoSet
+function setCurrentImageInfoSet(imageInfoSet: ImageInfoSet) {
+    gImageInfoAreasEditorSE.setImageInfo(imageInfoSet.imageInfoSE);
+    gImageInfoAreasEditorSEG.setImageInfo(imageInfoSet.imageInfoSEG);
+    gImageInfoAreasEditorBSE.setImageInfo(imageInfoSet.imageInfoBSE);
+    gImageInfoViewer.setImageInfo(imageInfoSet.imageInfoSE);
 }
 
 // window - onload
@@ -202,6 +209,7 @@ window.onload = (event) => {
 
     // gImageInfoSetList
     gImageInfoSetList = new ImageInfoSetList();
+    gImageInfoSetList.onloadFromJson = onLoadFromJson;
 
     // create and setup image info area aditor
     gImageInfoAreasEditorSE = new ImageInfoAreasEditor(divCanvasPanelSE);

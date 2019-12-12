@@ -2,8 +2,9 @@ import * as Tiff from "tiff.js";
 import { SelectionInfo } from "./SelectionInfo"
 import { SelectionInfoType } from "./SelectionInfoType"
 import { SelectionInfoMode } from "./SelectionInfoMode"
+import { timingSafeEqual } from "crypto";
 
-export enum ImageType { SE, BSE };
+export enum ImageType { SE, BSE, SEG };
 
 // ImageInfo
 export class ImageInfo {
@@ -17,28 +18,17 @@ export class ImageInfo {
     // canvases
     public canvasImage: HTMLCanvasElement = null;
     public canvasMask: HTMLCanvasElement = null;
-    public canvasHiLight: HTMLCanvasElement = null;
     public canvasBorders: HTMLCanvasElement = null;
-    public canvasHighResArea: HTMLCanvasElement = null;
-    public canvasHighResMask: HTMLCanvasElement = null;
     // image type
     public imageType: ImageType = ImageType.SE;
     // selection infos
     public selectionInfos: Array<SelectionInfo> = [];
-    // high resolution image suggestions settings
-    public HRWidth: number = 30;
-    public HRHeight: number = 23;
-    // intensity
-    public intensity: Uint32Array = new Uint32Array(256);
-    public intensityLow: number = 90;
-    public intensityMedium: number = 150;
-    public intensityHigh: number = 250;
     // image resolution
     public imageResolution: number = 1.0;
     // events
     public onloadImageFile: (this: ImageInfo, imageInfo: ImageInfo) => any = null;
     public onloadImageDataFile: (this: ImageInfo, imageInfo: ImageInfo) => any = null;
-
+    public onloadFromBase64: (this: ImageInfo, imageInfo: ImageInfo) => any = null;
     // constructor
     constructor() {
         // file reference
@@ -49,17 +39,9 @@ export class ImageInfo {
         // canvases
         this.canvasImage = document.createElement("canvas");
         this.canvasMask = document.createElement("canvas");
-        this.canvasHiLight = document.createElement("canvas");
         this.canvasBorders = document.createElement("canvas");
-        this.canvasHighResArea = document.createElement("canvas");
-        this.canvasHighResMask = document.createElement("canvas");
         // selections
         this.selectionInfos = [];
-        // intensity
-        this.intensity.fill(0);
-        this.intensityLow = 90;
-        this.intensityMedium = 150;
-        this.intensityHigh = 250;
         // events
         this.onloadImageFile = null;
         this.onloadImageDataFile = null;
@@ -82,19 +64,10 @@ export class ImageInfo {
         // create additional canvases
         this.canvasMask.width = this.canvasImage.width;
         this.canvasMask.height = this.canvasImage.height;
-        this.canvasHiLight.width = this.canvasImage.width;
-        this.canvasHiLight.height = this.canvasImage.height;
         this.canvasBorders.width = this.canvasImage.width;
         this.canvasBorders.height = this.canvasImage.height;
-        this.canvasHighResArea.width = this.canvasImage.width;
-        this.canvasHighResArea.height = this.canvasImage.height;
-        this.canvasHighResMask.width = this.canvasImage.width;
-        this.canvasHighResMask.height = this.canvasImage.height;
         // update data
-        this.updateHilightCanvas();
         this.updateBordersCanvas();
-        this.updateIntensity();
-        this.updateHighResAreaCanvas();
     }
 
     // addSelectionInfo
@@ -104,69 +77,6 @@ export class ImageInfo {
         selectionInfo.drawToContext(canvasMaskCtx);
         // add selection info
         this.selectionInfos.push(selectionInfo);
-    }
-
-    // updateHighResAreaCanvas
-    public updateHighResAreaCanvas() {
-        // get rect doms
-        let rectWidth: number = this.HRWidth / (this.imageResolution * 1000);
-        let rectHeight: number = this.HRHeight / (this.imageResolution * 1000);
-
-        // get context
-        let canvasHighResAreaCtx = this.canvasHighResArea.getContext("2d") as CanvasRenderingContext2D;
-        let canvasHighResMaskCtx = this.canvasHighResMask.getContext("2d") as CanvasRenderingContext2D;
-        //update high res image data
-        canvasHighResAreaCtx.globalAlpha = 0.0;
-        canvasHighResAreaCtx.fillStyle = "#00000";
-        canvasHighResAreaCtx.strokeStyle = "#00000";
-        canvasHighResAreaCtx.clearRect(0, 0, this.canvasHighResArea.width, this.canvasHighResArea.height);
-        canvasHighResAreaCtx.globalAlpha = 1.0;
-        //update high res image data
-        canvasHighResMaskCtx.globalAlpha = 0.0;
-        canvasHighResMaskCtx.fillStyle = "#00000";
-        canvasHighResMaskCtx.strokeStyle = "#00000";
-        canvasHighResMaskCtx.clearRect(0, 0, this.canvasHighResArea.width, this.canvasHighResArea.height);
-        canvasHighResMaskCtx.globalAlpha = 1.0;
-    }
-
-    // updateHilightCanvas
-    public updateHilightCanvas() {
-        // get context
-        let canvasImageCtx = this.canvasImage.getContext("2d");
-        let canvasMaskCtx = this.canvasMask.getContext("2d");
-        let canvasHiLightCtx = this.canvasHiLight.getContext("2d");
-        // get data arrays
-        let canvasImageData = canvasImageCtx.getImageData(0, 0, this.canvasImage.width, this.canvasImage.height);
-        let canvasMaskData = canvasMaskCtx.getImageData(0, 0, this.canvasMask.width, this.canvasMask.height);
-        let canvasHiLightData = canvasHiLightCtx.getImageData(0, 0, this.canvasHiLight.width, this.canvasHiLight.height);
-
-        // update hi-light image data
-        canvasHiLightData.data.fill(0);
-        for (let i = 0; i < canvasImageData.data.length; i += 4) {
-            if (canvasMaskData.data[i] > 0) {
-                if (canvasImageData.data[i] >= this.intensityHigh) {
-                    canvasHiLightData.data[i + 0] = 0;
-                    canvasHiLightData.data[i + 1] = 255;
-                    canvasHiLightData.data[i + 2] = 0;
-                    canvasHiLightData.data[i + 3] = 255;
-                }
-                if (canvasImageData.data[i] <= this.intensityMedium) {
-                    canvasHiLightData.data[i + 0] = 0;
-                    canvasHiLightData.data[i + 1] = 0;
-                    canvasHiLightData.data[i + 2] = 255;
-                    canvasHiLightData.data[i + 3] = 255;
-                }
-                if (canvasImageData.data[i] <= this.intensityLow) {
-                    canvasHiLightData.data[i + 0] = 255;
-                    canvasHiLightData.data[i + 1] = 0;
-                    canvasHiLightData.data[i + 2] = 0;
-                    canvasHiLightData.data[i + 3] = 255;
-                }
-            }
-        }
-
-        // store data to canvas
-        canvasHiLightCtx.putImageData(canvasHiLightData, 0, 0);
     }
 
     // updateBordersCanvas
@@ -199,94 +109,6 @@ export class ImageInfo {
         }
     }
 
-    // updateIntensity
-    public updateIntensity() {
-        // get context
-        let canvasImageCtx = this.canvasImage.getContext("2d");
-        let canvasMaskCtx = this.canvasMask.getContext("2d");
-        // get data arrays
-        let canvasImageData = canvasImageCtx.getImageData(0, 0, this.canvasImage.width, this.canvasImage.height);
-        let canvasMaskData = canvasMaskCtx.getImageData(0, 0, this.canvasMask.width, this.canvasMask.height);
-
-        // update image data
-        this.intensity.fill(0);
-        for (let i = 0; i < canvasImageData.data.length; i += 4) {
-            if (canvasMaskData.data[i] > 0) {
-                this.intensity[canvasImageData.data[i]]++;
-            }
-        }
-    }
-
-    // updateHilightCanvasAndIntensity
-    public updateHilightCanvasAndIntensity() {
-        // get context
-        let canvasImageCtx = this.canvasImage.getContext("2d");
-        let canvasMaskCtx = this.canvasMask.getContext("2d");
-        let canvasHiLightCtx = this.canvasHiLight.getContext("2d");
-        // get data arrays
-        let canvasImageData = canvasImageCtx.getImageData(0, 0, this.canvasImage.width, this.canvasImage.height);
-        let canvasMaskData = canvasMaskCtx.getImageData(0, 0, this.canvasMask.width, this.canvasMask.height);
-        let canvasHiLightData = canvasHiLightCtx.getImageData(0, 0, this.canvasHiLight.width, this.canvasHiLight.height);
-
-        // update hi-light image data
-        this.intensity.fill(0);
-        canvasHiLightData.data.fill(0);
-        for (let i = 0; i < canvasImageData.data.length; i += 4) {
-            if (canvasMaskData.data[i] > 0) {
-                // update hi-light
-                if (canvasImageData.data[i] >= this.intensityHigh) {
-                    canvasHiLightData.data[i + 0] = 0;
-                    canvasHiLightData.data[i + 1] = 255;
-                    canvasHiLightData.data[i + 2] = 0;
-                    canvasHiLightData.data[i + 3] = 255;
-                }
-                if (canvasImageData.data[i] <= this.intensityMedium) {
-                    canvasHiLightData.data[i + 0] = 0;
-                    canvasHiLightData.data[i + 1] = 0;
-                    canvasHiLightData.data[i + 2] = 255;
-                    canvasHiLightData.data[i + 3] = 255;
-                }
-                if (canvasImageData.data[i] <= this.intensityLow) {
-                    canvasHiLightData.data[i + 0] = 255;
-                    canvasHiLightData.data[i + 1] = 0;
-                    canvasHiLightData.data[i + 2] = 0;
-                    canvasHiLightData.data[i + 3] = 255;
-                }
-                // update intensity
-                this.intensity[canvasImageData.data[i]]++;
-            }
-        }
-
-        // store data to canvas
-        canvasHiLightCtx.putImageData(canvasHiLightData, 0, 0);
-    }
-
-    // getMaskValueByCoord
-    public getMaskValueByCoord(x: number, y: number): number {
-        let canvasHighResMaskCtx = this.canvasHighResMask.getContext("2d");
-        let canvasHighResMaskData = canvasHighResMaskCtx.getImageData(0, 0, this.canvasMask.width, this.canvasMask.height);
-        let r = canvasHighResMaskData.data[Math.round(y)*this.canvasHighResMask.width*4 + Math.round(x) * 4 + 0];
-        let g = canvasHighResMaskData.data[Math.round(y)*this.canvasHighResMask.width*4 + Math.round(x) * 4 + 1];
-        let b = canvasHighResMaskData.data[Math.round(y)*this.canvasHighResMask.width*4 + Math.round(x) * 4 + 2];
-        let a = canvasHighResMaskData.data[Math.round(y)*this.canvasHighResMask.width*4 + Math.round(x) * 4 + 3];
-        return b;
-    }
-
-    // setIntensityLow
-    public setIntensityLow(intensityLow: number) {
-        this.intensityLow = intensityLow;
-    }
-
-    // setIntensityMedium
-    public setIntensityMedium(intensityMedium: number) {
-        this.intensityMedium = intensityMedium;
-    }
-
-    // setIntensityHigh
-    public setIntensityHigh(intensityHigh: number) {
-        this.intensityHigh = intensityHigh;
-    }
-
     // loadImageDataFile
     public loadImageFile(file: File): void {
         // store data file ref
@@ -315,6 +137,33 @@ export class ImageInfo {
         }
         fileReader.readAsArrayBuffer(file);
     }
+
+    // loadImageAsSegmented
+    public loadImageAsSegmented(width: number, height: number, b64: string): void {
+        // create image from base64
+        let im = new Image();
+        im.onload = event => {
+            // decode data
+            this.canvasImage.width = im.width;
+            this.canvasImage.height = im.height;
+            // get context
+            let canvasImageCtx = this.canvasImage.getContext("2d") as CanvasRenderingContext2D;
+            canvasImageCtx.drawImage(im, 0, 0);
+            // gte image data
+            let canvasImageData = canvasImageCtx.getImageData(0, 0, this.canvasImage.width, this.canvasImage.height);
+            // decode image data
+            for (let i = 0; i < im.width * im.height; i++) {
+                canvasImageData.data[i * 4 + 0] = color_map[canvasImageData.data[i * 4 + 0]][0];
+                canvasImageData.data[i * 4 + 1] = color_map[canvasImageData.data[i * 4 + 1]][1];
+                canvasImageData.data[i * 4 + 2] = color_map[canvasImageData.data[i * 4 + 2]][2];
+                canvasImageData.data[i * 4 + 3] = 255;
+            }
+            canvasImageCtx.putImageData(canvasImageData, 0, 0);
+            this.updateAllCanvases();
+            this.onloadFromBase64 && this.onloadFromBase64(this);
+        }
+        im.src = "data:image/png;base64," + b64;
+    }
 }
 
 // valueToHex
@@ -330,3 +179,5 @@ function rgbToHexColor(r: number, g: number, b: number): string {
     var blue = valueToHex(b);
     return "#" + red + green + blue;
 }
+
+let color_map = [[100, 100, 100], [0, 0, 0], [0, 200, 0], [255, 255, 255]];
