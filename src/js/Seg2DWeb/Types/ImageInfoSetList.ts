@@ -3,7 +3,9 @@ import * as base64js from "base64-js";
 import { ImageInfo, ImageType } from "./ImageInfo";
 
 // base URL
-export const URL = "http://localhost:8088";
+//export const POST_URL = "http://localhost:8088/seg2d";
+export const POST_URL = "http://localhost:30001/seg2dimages";
+
 
 // ImageInfoSetList
 export class ImageInfoSetList {
@@ -63,9 +65,9 @@ export class ImageInfoSetList {
     // postImages
     public postImages(): Promise<string> {
         return new Promise<string>((resolve, reject) => {
+            console.log("Send to " + POST_URL);
             let xhr = new XMLHttpRequest();
-            let url = URL + "/seg2d";
-            xhr.open("POST", url, true);
+            xhr.open("POST", POST_URL, true);
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.onreadystatechange = event => {
                 if (xhr.readyState === 4 && xhr.status === 200) {

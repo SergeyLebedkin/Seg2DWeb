@@ -30,7 +30,6 @@ export class ImageInfoSet {
         this.imageInfoBSE.onloadImageFile = this.onLoadImage.bind(this);
         this.imageInfoSE.loadImageFile(this.fileSE);
         this.imageInfoBSE.loadImageFile(this.fileBSE);
-        
     }
 
     // onLoadImage
