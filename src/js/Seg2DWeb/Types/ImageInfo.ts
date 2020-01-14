@@ -3,6 +3,7 @@ import { SelectionInfo } from "./SelectionInfo"
 import { SelectionInfoType } from "./SelectionInfoType"
 import { SelectionInfoMode } from "./SelectionInfoMode"
 import { timingSafeEqual } from "crypto";
+import { getOverlayLog } from "../Components/OverlayLog";
 
 export enum ImageType { SE, BSE, SEG };
 
@@ -133,6 +134,7 @@ export class ImageInfo {
             this.copyFromCanvas(tiff.toCanvas());
             this.loaded = true;
             // call event
+            getOverlayLog().addMessage(`Image file ${this.fileRef.name} loaded...`);
             this.onloadImageFile && this.onloadImageFile(this);
         }
         fileReader.readAsArrayBuffer(file);
@@ -148,6 +150,7 @@ export class ImageInfo {
             this.canvasImage.height = im.height;
             // get context
             let canvasImageCtx = this.canvasImage.getContext("2d") as CanvasRenderingContext2D;
+            canvasImageCtx.globalAlpha = 1.0;
             canvasImageCtx.drawImage(im, 0, 0);
             // gte image data
             let canvasImageData = canvasImageCtx.getImageData(0, 0, this.canvasImage.width, this.canvasImage.height);

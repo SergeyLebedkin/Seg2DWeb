@@ -1,10 +1,11 @@
 import { ImageInfoSet } from "./ImageInfoSet";
 import * as base64js from "base64-js";
 import { ImageInfo, ImageType } from "./ImageInfo";
+import { getOverlayLog } from "../Components/OverlayLog";
 
 // base URL
-//export const POST_URL = "http://localhost:8088/seg2d";
-export const POST_URL = "http://localhost:30001/seg2dimages";
+export const POST_URL = "http://localhost:8088/seg2d";
+//export const POST_URL = "http://localhost:30001/seg2dimages";
 
 
 // ImageInfoSetList
@@ -27,6 +28,7 @@ export class ImageInfoSetList {
             this.imageInfoSetList[i] = new ImageInfoSet();
             this.imageInfoSetList[i].fileSE = files[i];
             this.imageInfoSetList[i].name = files[i].name;
+            getOverlayLog().addMessage(`Image file ${files[i].name} selected...`);
         }
     }
 
@@ -35,6 +37,7 @@ export class ImageInfoSetList {
         this.imageInfoSetList.length = files.length;
         for (let i = 0; i < files.length; i++) {
             this.imageInfoSetList[i].fileBSE = files[i];
+            getOverlayLog().addMessage(`Image file ${files[i].name} selected...`);
         }
         this.preloadImages();
     }
@@ -65,7 +68,7 @@ export class ImageInfoSetList {
     // postImages
     public postImages(): Promise<string> {
         return new Promise<string>((resolve, reject) => {
-            console.log("Send to " + POST_URL);
+            getOverlayLog().addMessage(`Images sended to ${POST_URL} ...`);
             let xhr = new XMLHttpRequest();
             xhr.open("POST", POST_URL, true);
             xhr.setRequestHeader("Content-Type", "application/json");
@@ -99,11 +102,10 @@ export class ImageInfoSetList {
 
     // loadFromJson
     public loadFromJson(value: string) {
+        getOverlayLog().addMessage("Images received, decoding...")
         let valueJSON = JSON.parse(value);
         let dims = JSON.parse(valueJSON.dimensions);
         let segs = JSON.parse(valueJSON.segmentations);
-        console.log("dims", dims);
-        console.log("segs", segs);
         for (let i = 0; i < dims.length; i++) {
             this.imageInfoSetList[i].imageInfoSEG = new ImageInfo();
             this.imageInfoSetList[i].imageInfoSEG.onloadFromBase64 = this.onLoadFromBase64.bind(this);
@@ -115,6 +117,7 @@ export class ImageInfoSetList {
 
     // onLoadFromBase64
     private onLoadFromBase64(imageInfo: ImageInfo) {
+        getOverlayLog().addMessage(`Image ${imageInfo.name} decoded...`)
         let loaded: boolean = true;
         for (let imageInfoSet of this.imageInfoSetList)
             if ((imageInfoSet.imageInfoSEG != null) && (!imageInfoSet.imageInfoSEG.loaded))

@@ -1,6 +1,7 @@
 import { ImageInfo } from "./Seg2DWeb/Types/ImageInfo";
 import { MouseUsageMode } from "./Seg2DWeb/Types/MouseUsageMode";
 import { ImageInfoAreasEditor } from "./Seg2DWeb/Components/ImageInfoAreasEditor";
+import { OverlayLog, initOverlayLog, getOverlayLog } from "./Seg2DWeb/Components/OverlayLog";
 import { SelectionInfo } from "./Seg2DWeb/Types/SelectionInfo";
 import { ImageInfoViewer } from "./Seg2DWeb/Components/ImageInfoViewer";
 import { ImageInfoSetList } from "./Seg2DWeb/Types/ImageInfoSetList";
@@ -32,8 +33,10 @@ let buttonSaveImages: HTMLButtonElement = null;
 let inputLoadImagesSE: HTMLInputElement = null;
 let inputLoadImagesBSE: HTMLInputElement = null;
 let divInfoViewer: HTMLDivElement = null;
+let divOverlay: HTMLDivElement = null;
 
 // globals
+let gOverlayLog: OverlayLog = null;
 let gImageInfoSetList: ImageInfoSetList = null;
 let gImageInfoAreasEditorSE: ImageInfoAreasEditor = null;
 let gImageInfoAreasEditorBSE: ImageInfoAreasEditor = null;
@@ -56,6 +59,7 @@ function loadImagesBSE() {
     inputLoadImagesBSE.accept = ".tiff,.tif";
     inputLoadImagesBSE.onchange = event => {
         gImageInfoSetList.setImageFilesBSE(event.currentTarget["files"]);
+        getOverlayLog().show();
     }
     inputLoadImagesBSE.click();
 }
@@ -164,6 +168,7 @@ function onAddSelectionInfoBSE(selectionInfo: SelectionInfo) {
 
 // onLoadFromJson
 function onLoadFromJson() {
+    getOverlayLog().hide();
     if (gCurrentImageInfoIndex < 0) {
         gCurrentImageInfoIndex = 0;
         setCurrentImageInfoSet(gImageInfoSetList.imageInfoSetList[gCurrentImageInfoIndex]);
@@ -206,10 +211,14 @@ window.onload = (event) => {
     inputLoadImagesSE = document.getElementById("inputLoadImagesSE") as HTMLInputElement;
     inputLoadImagesBSE = document.getElementById("inputLoadImagesBSE") as HTMLInputElement;
     divInfoViewer = document.getElementById("divInfoViewer") as HTMLDivElement;
+    divOverlay = document.getElementById("divOverlay") as HTMLDivElement;
 
     // gImageInfoSetList
     gImageInfoSetList = new ImageInfoSetList();
     gImageInfoSetList.onloadFromJson = onLoadFromJson;
+
+    // create and get overlay
+    initOverlayLog(divOverlay);
 
     // create and setup image info area aditor
     gImageInfoAreasEditorSE = new ImageInfoAreasEditor(divCanvasPanelSE);
