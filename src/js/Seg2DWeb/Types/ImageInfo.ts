@@ -163,6 +163,7 @@ export class ImageInfo {
             }
             canvasImageCtx.putImageData(canvasImageData, 0, 0);
             this.updateAllCanvases();
+            this.loaded = true;
             this.onloadFromBase64 && this.onloadFromBase64(this);
         }
         im.src = "data:image/png;base64," + b64;

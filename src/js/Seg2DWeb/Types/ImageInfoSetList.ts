@@ -4,7 +4,7 @@ import { ImageInfo, ImageType } from "./ImageInfo";
 import { getOverlayLog } from "../Components/OverlayLog";
 
 // base URL
-export const POST_URL = "http://localhost:8088/seg2d";
+export const POST_URL = "http://localhost:30002/seg2d";
 //export const POST_URL = "http://localhost:30001/seg2dimages";
 
 
@@ -28,7 +28,7 @@ export class ImageInfoSetList {
             this.imageInfoSetList[i] = new ImageInfoSet();
             this.imageInfoSetList[i].fileSE = files[i];
             this.imageInfoSetList[i].name = files[i].name;
-            getOverlayLog().addMessage(`Image file ${files[i].name} selected...`);
+            getOverlayLog().addMessage(`Image file ${files[i].name} selected, loading...`);
         }
     }
 
@@ -37,7 +37,7 @@ export class ImageInfoSetList {
         this.imageInfoSetList.length = files.length;
         for (let i = 0; i < files.length; i++) {
             this.imageInfoSetList[i].fileBSE = files[i];
-            getOverlayLog().addMessage(`Image file ${files[i].name} selected...`);
+            getOverlayLog().addMessage(`Image file ${files[i].name} selected, loading...`);
         }
         this.preloadImages();
     }
@@ -68,7 +68,6 @@ export class ImageInfoSetList {
     // postImages
     public postImages(): Promise<string> {
         return new Promise<string>((resolve, reject) => {
-            getOverlayLog().addMessage(`Images sended to ${POST_URL} ...`);
             let xhr = new XMLHttpRequest();
             xhr.open("POST", POST_URL, true);
             xhr.setRequestHeader("Content-Type", "application/json");
@@ -90,6 +89,7 @@ export class ImageInfoSetList {
                     images: {}
                 }
             };
+            getOverlayLog().addMessage(`Images encoding ...`);
             this.imageInfoSetList.forEach(imageInfoSet => {
                 dataJSON.payload.images[imageInfoSet.name] = {};
                 dataJSON.payload.images[imageInfoSet.name]["se" ] = imageInfoSet.imageInfoSE .canvasImage.toDataURL().replace("data:image/png;base64,", "");
@@ -97,6 +97,7 @@ export class ImageInfoSetList {
             });
             let data = JSON.stringify(dataJSON);
             xhr.send(data);
+            getOverlayLog().addMessage(`Images sended to ${POST_URL} ...`);
         });
     }
 
@@ -110,7 +111,6 @@ export class ImageInfoSetList {
             this.imageInfoSetList[i].imageInfoSEG = new ImageInfo();
             this.imageInfoSetList[i].imageInfoSEG.onloadFromBase64 = this.onLoadFromBase64.bind(this);
             this.imageInfoSetList[i].imageInfoSEG.loadImageAsSegmented(dims[i][1], dims[i][0], segs[i]);
-            this.imageInfoSetList[i].imageInfoSEG.loaded = true;
             this.imageInfoSetList[i].imageInfoSEG.imageType = ImageType.SEG;
         }
     }
