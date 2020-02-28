@@ -4,7 +4,7 @@ import { ImageInfo, ImageType } from "./ImageInfo";
 import { getOverlayLog } from "../Components/OverlayLog";
 
 // base URL
-export const POST_URL = "http://localhost:30002/seg2d";
+export const POST_URL = "http://localhost:30001/seg2d";
 //export const POST_URL = "http://localhost:30001/seg2dimages";
 
 

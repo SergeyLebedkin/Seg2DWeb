@@ -184,4 +184,4 @@ function rgbToHexColor(r: number, g: number, b: number): string {
     return "#" + red + green + blue;
 }
 
-let color_map = [[100, 100, 100], [0, 0, 0], [0, 200, 0], [255, 255, 255]];
+let color_map = [[0, 0, 0], [0, 255, 0], [127, 127, 127], [255, 255, 255]]; // black, green, gray, white 
